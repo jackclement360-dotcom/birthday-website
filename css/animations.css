@@ -84,9 +84,12 @@
   50%      { box-shadow: 0 0 34px 8px rgba(217, 175, 106, 0.75); }
 }
 
+/* Uses drop-shadow (a filter) rather than text-shadow: text-shadow paints
+   ON TOP of background-clipped gradient text and visibly washes it out,
+   while drop-shadow glows around the rendered glyphs without tinting them. */
 @keyframes textGlow {
-  0%, 100% { text-shadow: 0 0 12px rgba(217, 175, 106, 0.35), 0 0 2px rgba(255,255,255,0.6); }
-  50%      { text-shadow: 0 0 24px rgba(217, 175, 106, 0.65), 0 0 4px rgba(255,255,255,0.8); }
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(217, 175, 106, 0.45)); }
+  50%      { filter: drop-shadow(0 0 22px rgba(217, 175, 106, 0.8)); }
 }
 
 @keyframes gradientShift {

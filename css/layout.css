@@ -6,8 +6,19 @@
 ============================================================================ */
 
 /* ── Dreamy animated background ──────────────────────────────────────── */
+/* Painted on a fixed, full-viewport pseudo-element rather than on body:
+   body's own background only covers body's box, so any scene taller than
+   100vh would scroll past the gradient into plain white. A fixed layer
+   always fills exactly the viewport, no matter how tall a scene gets. */
 body {
   min-height: 100vh;
+  background: var(--color-bg-1);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   background: linear-gradient(
     120deg,
     var(--color-bg-1) 0%,
