@@ -20,6 +20,9 @@ const SceneReasons = (function () {
     AppEvents.on("scene:enter", (name) => {
       if (name === "reasons") replayAnimation($("#reasons-grid"), "play-intro");
     });
+
+    // Rebuild on replay: unflips every card AND reshuffles the order.
+    AppEvents.on("journey:restart", buildGrid);
   }
 
   function buildGrid() {

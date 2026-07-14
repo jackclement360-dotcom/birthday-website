@@ -20,6 +20,11 @@ const SceneGallery = (function () {
     AppEvents.on("scene:enter", (name) => {
       if (name === "gallery") replayAnimation($("#gallery-grid"), "play-intro");
     });
+
+    // Unflip all cards when the journey is replayed from the finale.
+    AppEvents.on("journey:restart", () => {
+      $$(".memory-card", $("#gallery-grid")).forEach((card) => card.classList.remove("is-flipped"));
+    });
   }
 
   function buildGrid() {

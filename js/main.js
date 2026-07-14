@@ -79,6 +79,9 @@ const Journey = (function () {
   function restart() {
     visited = new Set();
     currentIndex = 0;
+    // Lets sections reset per-run state (unflip cards, reshuffle reasons)
+    // so replaying feels like the first time, not a museum of spoilers.
+    AppEvents.emit("journey:restart");
     goTo(SCENE_ORDER[0]);
   }
 
