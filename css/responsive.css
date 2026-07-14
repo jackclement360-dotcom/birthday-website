@@ -1,0 +1,111 @@
+/* ============================================================================
+   RESPONSIVE.CSS — mobile & tablet breakpoints. Base styles above are
+   already fluid (clamp(), auto-fit grids); this file handles the layout
+   shapes that need to genuinely restructure on small screens — mainly
+   the timeline, which collapses from two columns to one.
+============================================================================ */
+
+/* ── Tablet and below: timeline collapses to a single left-aligned column ── */
+@media (max-width: 900px) {
+  .timeline::before {
+    left: 22px;
+  }
+  .timeline-item,
+  .timeline-item:nth-child(even) {
+    width: 100%;
+    left: 0;
+    padding: 0 var(--space-sm) var(--space-lg) 56px;
+  }
+  .timeline-item:nth-child(odd) .timeline-icon,
+  .timeline-item:nth-child(even) .timeline-icon {
+    left: 0;
+    right: auto;
+  }
+  .timeline-item.is-visible,
+  .timeline-item:nth-child(even).is-visible {
+    animation-name: fadeInUp;
+  }
+}
+
+/* ── General mobile tightening ───────────────────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --space-lg: 2rem;
+    --space-xl: 2.75rem;
+    --space-2xl: 3.5rem;
+  }
+
+  .scene {
+    padding: 4.5rem var(--space-sm) 6rem;
+  }
+
+  .glass-panel {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .top-controls {
+    top: var(--space-xs);
+    right: var(--space-xs);
+  }
+  .icon-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .progress-dots {
+    bottom: var(--space-xs);
+    padding: 0.4em 0.6em;
+  }
+
+  .modal-dialog {
+    padding: var(--space-md);
+    max-height: 90vh;
+  }
+
+  .letter-paper {
+    padding: var(--space-md);
+    padding-bottom: var(--space-lg);
+  }
+  .letter-skip {
+    right: var(--space-sm);
+  }
+
+  .gallery-grid,
+  .reasons-grid,
+  .envelopes-grid {
+    gap: var(--space-sm);
+  }
+
+  .reasons-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .finale-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .finale-actions .btn {
+    width: 100%;
+  }
+
+  .secret-star {
+    width: 26px;
+    height: 26px;
+    font-size: 1rem;
+  }
+}
+
+/* ── Very small phones: countdown grid becomes 2x2 ───────────────────── */
+@media (max-width: 380px) {
+  .countdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: var(--space-sm);
+  }
+}
+
+/* ── Larger screens: give the wide scenes a little more breathing room ── */
+@media (min-width: 1400px) {
+  .scene-inner-wide {
+    max-width: 1240px;
+  }
+}

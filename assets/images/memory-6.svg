@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="g6" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9af6a"/>
+      <stop offset="1" stop-color="#f7d9e3"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#g6)"/>
+  <circle cx="120" cy="680" r="120" fill="#ffffff" opacity="0.15"/>
+  <circle cx="480" cy="140" r="90" fill="#ffffff" opacity="0.14"/>
+  <g transform="translate(300,330)" fill="#ffffff" opacity="0.92">
+    <path d="M0 26C0 26 -46 0 -46 -30C-46 -46 -33 -58 -18 -58C-9 -58 -2 -54 0 -48C2 -54 9 -58 18 -58C33 -58 46 -46 46 -30C46 0 0 26 0 26Z"/>
+  </g>
+  <text x="300" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#ffffff" opacity="0.95">Just Us</text>
+  <text x="300" y="505" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#ffffff" opacity="0.8">Replace with your favorite photo</text>
+  <text x="300" y="528" text-anchor="middle" font-family="monospace" font-size="13" fill="#ffffff" opacity="0.65">assets/images/memory-6.svg</text>
+</svg>

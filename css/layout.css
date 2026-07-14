@@ -1,0 +1,346 @@
+/* ============================================================================
+   LAYOUT.CSS — global chrome: background, loading screen, canvases, top
+   controls, progress dots, the scene crossfade system, buttons, and modals.
+   Section-specific visuals (letter paper, gallery cards, gift box, etc.)
+   live in sections.css — this file is everything that appears on every scene.
+============================================================================ */
+
+/* ── Dreamy animated background ──────────────────────────────────────── */
+body {
+  min-height: 100vh;
+  background: linear-gradient(
+    120deg,
+    var(--color-bg-1) 0%,
+    var(--color-bg-2) 35%,
+    var(--color-bg-3) 70%,
+    var(--color-cream-deep) 100%
+  );
+  background-size: 300% 300%;
+  animation: gradientShift 26s ease-in-out infinite;
+}
+
+/* ── Custom loading screen ───────────────────────────────────────────── */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loading);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  background: linear-gradient(135deg, var(--color-bg-1), var(--color-bg-2));
+  transition: opacity var(--duration-slow) var(--ease-standard),
+              visibility var(--duration-slow) var(--ease-standard);
+}
+.loading-screen.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.loading-heart {
+  width: 64px;
+  height: 58px;
+  fill: var(--color-pink-deep);
+  filter: drop-shadow(0 0 18px rgba(217, 120, 159, 0.55));
+  animation: heartbeat 1.6s ease-in-out infinite;
+}
+.loading-message {
+  font-family: var(--font-heading);
+  font-style: italic;
+  color: var(--color-text-soft);
+  letter-spacing: 0.02em;
+}
+
+/* ── Ambient / cursor canvases (fixed, decorative, never intercept clicks) ── */
+.ambient-canvas,
+.cursor-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.ambient-canvas { z-index: var(--z-ambient); }
+.cursor-canvas   { z-index: var(--z-cursor); }
+
+/* ── Top controls (sound toggle + star counter) ──────────────────────── */
+.top-controls {
+  position: fixed;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: var(--z-controls);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.icon-button {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-round);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-soft);
+  font-size: 1.15rem;
+  transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast);
+}
+.icon-button:hover { transform: translateY(-2px) scale(1.05); box-shadow: var(--shadow-lift); }
+.icon-button:active { transform: translateY(0) scale(0.96); }
+.icon-button .icon-off { display: none; }
+.icon-button[aria-pressed="false"] .icon-on { display: none; }
+.icon-button[aria-pressed="false"] .icon-off { display: inline; }
+
+.star-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.5em 0.9em;
+  border-radius: var(--radius-round);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-soft);
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  animation: fadeInDown var(--duration-base) var(--ease-standard);
+}
+.star-counter-icon {
+  width: 14px;
+  height: 14px;
+  fill: var(--color-gold);
+}
+
+/* ── Progress dots ────────────────────────────────────────────────────── */
+.progress-dots {
+  position: fixed;
+  bottom: var(--space-sm);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-controls);
+  display: flex;
+  gap: 0.6em;
+  padding: 0.5em 0.8em;
+  border-radius: var(--radius-round);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.progress-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(107, 84, 104, 0.25);
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+.progress-dot.is-visited { background: var(--color-pink-deep); cursor: pointer; }
+.progress-dot.is-current {
+  background: var(--color-gold);
+  width: 22px;
+  border-radius: var(--radius-round);
+  animation: dotPulse 2.4s ease-in-out infinite;
+}
+.progress-dot:disabled { cursor: default; }
+
+/* ── Scene crossfade system ──────────────────────────────────────────── */
+main.journey {
+  position: relative;
+  z-index: var(--z-content);
+  width: 100%;
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 6vw, 5rem) var(--space-md);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--duration-slow) var(--ease-standard);
+  overflow: hidden;
+}
+.scene.is-active {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.scene-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+.scene-inner-wide {
+  max-width: 1080px;
+}
+.eyebrow {
+  font-size: 1.4rem;
+  opacity: 0.8;
+}
+.scene-heading {
+  font-size: clamp(1.9rem, 4.5vw, 2.75rem);
+}
+.scene-subheading {
+  color: var(--color-text-soft);
+  max-width: 46ch;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-lg);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.95em 2.1em;
+  min-height: 48px;
+  border-radius: var(--radius-round);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  transition: transform var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard),
+              opacity var(--duration-fast);
+}
+.btn:hover { transform: translateY(-3px); }
+.btn:active { transform: translateY(0) scale(0.98); }
+
+.btn-primary {
+  color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-pink-deep), var(--color-gold));
+  box-shadow: var(--shadow-soft);
+}
+.btn-primary:hover { box-shadow: var(--shadow-lift); }
+
+.btn-secondary {
+  color: var(--color-text);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.btn-secondary:hover { background: var(--glass-bg-strong); }
+
+.btn-glow {
+  animation: glowPulse 2.6s ease-in-out infinite;
+}
+
+/* ── Modals ───────────────────────────────────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(61, 42, 63, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn var(--duration-base) var(--ease-standard);
+}
+.modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: var(--shadow-lift);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  text-align: center;
+  animation: popIn var(--duration-base) var(--ease-standard);
+}
+.modal-close {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration-fast), transform var(--duration-fast);
+}
+.modal-close:hover { background: rgba(255, 255, 255, 0.8); transform: rotate(90deg); }
+
+/* ── Secret-star discovery toast ─────────────────────────────────────── */
+.star-toast {
+  position: fixed;
+  bottom: calc(var(--space-sm) + 56px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  max-width: min(90vw, 360px);
+  padding: 0.9em 1.4em;
+  border-radius: var(--radius-md);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-lift);
+  text-align: center;
+  font-size: 0.95rem;
+  animation: fadeInUp var(--duration-base) var(--ease-standard);
+}
+
+/* ── Konami code celebration overlay ─────────────────────────────────── */
+.konami-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-konami);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(61, 42, 63, 0.55);
+  backdrop-filter: blur(4px);
+  animation: fadeIn var(--duration-fast) var(--ease-standard);
+}
+.konami-content {
+  max-width: 480px;
+  margin: var(--space-md);
+  padding: var(--space-lg);
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  color: var(--color-white);
+  text-shadow: 0 2px 18px rgba(0,0,0,0.35);
+  animation: popIn var(--duration-base) var(--ease-standard);
+}

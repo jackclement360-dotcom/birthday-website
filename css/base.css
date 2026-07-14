@@ -1,0 +1,186 @@
+/* ============================================================================
+   BASE.CSS — reset, design tokens, and base typography.
+   Every color, font, spacing, and timing value used anywhere on the site is
+   defined once here as a CSS custom property. Change the palette by editing
+   the :root block below — everything else references these tokens.
+============================================================================ */
+
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+html, body, h1, h2, h3, h4, p, figure, blockquote, dl, dd, ul, ol {
+  margin: 0;
+}
+ul, ol {
+  padding: 0;
+  list-style: none;
+}
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+a {
+  color: inherit;
+}
+
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+:root {
+  /* Palette — soft pinks, lavender, cream, gold accent */
+  --color-cream: #fdf6ec;
+  --color-cream-deep: #f7ead4;
+  --color-blush: #f7d9e3;
+  --color-pink: #eeaecb;
+  --color-pink-deep: #d9789f;
+  --color-lavender: #dcd0f5;
+  --color-lavender-deep: #b6a0e0;
+  --color-gold: #d9af6a;
+  --color-gold-light: #f0d9a3;
+  --color-white: #ffffff;
+  --color-ink: #3d2a3f;
+  --color-ink-soft: #6b5468;
+
+  /* Semantic tokens */
+  --color-bg-1: var(--color-cream);
+  --color-bg-2: var(--color-blush);
+  --color-bg-3: var(--color-lavender);
+  --color-text: var(--color-ink);
+  --color-text-soft: var(--color-ink-soft);
+  --color-accent: var(--color-gold);
+  --color-accent-soft: var(--color-gold-light);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.38);
+  --glass-bg-strong: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px rgba(115, 60, 100, 0.18);
+
+  /* Typography
+     Ships with elegant system-font fallbacks so it looks great with zero
+     dependencies. Want it even more romantic? See README.md → "Optional:
+     add real fonts" for a two-minute, still-offline upgrade to something
+     like Playfair Display + a handwriting script font. */
+  --font-heading: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-script: "Segoe Print", "Bradley Hand", "Snell Roundhand", "Comic Sans MS", cursive;
+
+  /* Spacing scale */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  /* Radii + shadows */
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-round: 999px;
+  --shadow-soft: 0 10px 30px rgba(120, 70, 105, 0.15);
+  --shadow-lift: 0 16px 44px rgba(120, 70, 105, 0.25);
+
+  /* Motion */
+  --duration-fast: 180ms;
+  --duration-base: 420ms;
+  --duration-slow: 900ms;
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index scale */
+  --z-ambient: 0;
+  --z-cursor: 1;
+  --z-content: 10;
+  --z-controls: 50;
+  --z-modal: 100;
+  --z-toast: 110;
+  --z-konami: 120;
+  --z-loading: 200;
+}
+
+/* ── Base typography ──────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-text);
+}
+::selection {
+  background: var(--color-pink);
+  color: var(--color-white);
+}
+
+/* ── Focus visibility (accessibility) — never remove outlines, only restyle ── */
+:focus-visible {
+  outline: 2px solid var(--color-pink-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Small shared utility classes ────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.sr-only-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-sm);
+  background: var(--color-ink);
+  color: var(--color-white);
+  padding: 0.75em 1.25em;
+  border-radius: var(--radius-sm);
+  z-index: 999;
+  transition: top var(--duration-fast) var(--ease-standard);
+}
+.skip-link:focus {
+  top: var(--space-sm);
+}
+
+.text-link {
+  font-size: 0.9rem;
+  color: var(--color-text-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.8;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+.text-link:hover,
+.text-link:focus-visible {
+  opacity: 1;
+}

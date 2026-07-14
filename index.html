@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title id="page-title">Happy Birthday, My Love</title>
+  <meta name="description" content="A little interactive birthday surprise, made with love." />
+  <meta name="theme-color" content="#f6d9e6" />
+  <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <!-- Skip link, first thing a keyboard/screen-reader user reaches -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Reusable inline SVG symbols, referenced with <use> throughout -->
+  <svg class="sr-only-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="icon-heart" viewBox="0 0 32 29">
+        <path d="M16 29C16 29 0 18.5 0 8.8 0 3.9 3.9 0 8.8 0c2.9 0 5.5 1.4 7.2 3.6C17.7 1.4 20.3 0 23.2 0 28.1 0 32 3.9 32 8.8 32 18.5 16 29 16 29z" />
+      </symbol>
+      <symbol id="icon-sparkle" viewBox="0 0 24 24">
+        <path d="M12 0c.8 4.9 2.1 8.2 4 10s5.1 3.2 10 4c-4.9.8-8.2 2.1-10 4s-3.2 5.1-4 10c-.8-4.9-2.1-8.2-4-10s-5.1-3.2-10-4c4.9-.8 8.2-2.1 10-4s3.2-5.1 4-10z" />
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ============ NOSCRIPT FALLBACK ============ -->
+  <noscript>
+    <div style="padding:3rem;text-align:center;font-family:sans-serif;color:#5b3a52;">
+      This little surprise needs JavaScript turned on to unwrap properly 💛
+    </div>
+  </noscript>
+
+  <!-- ============ CUSTOM LOADING SCREEN ============ -->
+  <div id="loading-screen" class="loading-screen" role="status" aria-live="polite">
+    <svg class="loading-heart" viewBox="0 0 32 29" aria-hidden="true">
+      <use href="#icon-heart"></use>
+    </svg>
+    <p class="loading-message" id="loading-message"></p>
+  </div>
+
+  <!-- ============ AMBIENT BACKGROUND LAYERS (persist across every scene) ============ -->
+  <canvas id="ambient-canvas" class="ambient-canvas" aria-hidden="true"></canvas>
+  <canvas id="cursor-canvas" class="cursor-canvas" aria-hidden="true"></canvas>
+
+  <!-- ============ TOP CONTROLS ============ -->
+  <div class="top-controls">
+    <div id="star-counter" class="star-counter" hidden>
+      <svg class="star-counter-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-sparkle"></use></svg>
+      <span id="star-count-text">0/6</span>
+    </div>
+    <button id="sound-toggle" class="icon-button" type="button" aria-pressed="true" title="Toggle music &amp; sound">
+      <span class="icon-on" aria-hidden="true">🔊</span>
+      <span class="icon-off" aria-hidden="true">🔇</span>
+      <span class="sr-only">Toggle music and sound</span>
+    </button>
+  </div>
+  <audio id="bg-music" loop preload="none"></audio>
+
+  <!-- ============ PROGRESS DOTS ============ -->
+  <nav class="progress-dots" id="progress-dots" aria-label="Journey progress" hidden></nav>
+
+  <!-- ============ MAIN JOURNEY ============ -->
+  <main id="main" class="journey">
+
+    <!-- ============================================================
+         SCENE 0 — COUNTDOWN (optional, shown only before her birthday)
+    ============================================================= -->
+    <section class="scene scene-countdown" id="scene-countdown" data-scene="countdown">
+      <div class="scene-inner glass-panel">
+        <p class="eyebrow" aria-hidden="true">✨</p>
+        <h2 class="scene-heading" id="countdown-heading"></h2>
+        <p class="scene-subheading" id="countdown-subheading"></p>
+        <div class="countdown-grid" id="countdown-grid" role="timer" aria-live="off">
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-days">00</span>
+            <span class="countdown-label">Days</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-hours">00</span>
+            <span class="countdown-label">Hours</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-minutes">00</span>
+            <span class="countdown-label">Minutes</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-seconds">00</span>
+            <span class="countdown-label">Seconds</span>
+          </div>
+        </div>
+        <p class="countdown-arrived" id="countdown-arrived" hidden></p>
+        <button class="text-link" id="countdown-skip-btn" type="button">I can't wait — skip ahead →</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 1 — WELCOME
+    ============================================================= -->
+    <section class="scene scene-welcome" id="scene-welcome" data-scene="welcome">
+      <div class="scene-inner">
+        <div class="welcome-glow" aria-hidden="true"></div>
+        <h1 class="welcome-title" id="welcome-title"></h1>
+        <p class="welcome-subtitle" id="welcome-subtitle"></p>
+        <button class="btn btn-primary btn-glow" id="welcome-btn" type="button"></button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 2 — LOVE LETTER
+    ============================================================= -->
+    <section class="scene scene-letter" id="scene-letter" data-scene="letter">
+      <div class="scene-inner">
+        <h2 class="scene-heading" id="letter-heading"></h2>
+        <div class="letter-paper" id="letter-paper">
+          <div class="letter-text" id="letter-text" aria-live="polite"></div>
+          <p class="letter-signoff" id="letter-signoff" hidden></p>
+          <button class="text-link letter-skip" id="letter-skip-btn" type="button">Skip typing</button>
+        </div>
+        <button class="btn btn-primary" id="letter-continue-btn" type="button" hidden></button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 3 — OUR MEMORIES (photo gallery)
+    ============================================================= -->
+    <section class="scene scene-gallery" id="scene-gallery" data-scene="gallery">
+      <div class="scene-inner scene-inner-wide">
+        <h2 class="scene-heading" id="gallery-heading"></h2>
+        <p class="scene-subheading" id="gallery-subheading"></p>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <button class="btn btn-primary" id="gallery-continue-btn" type="button"></button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 4 — REASONS I LOVE YOU (20 cards)
+    ============================================================= -->
+    <section class="scene scene-reasons" id="scene-reasons" data-scene="reasons">
+      <div class="scene-inner scene-inner-wide">
+        <h2 class="scene-heading" id="reasons-heading"></h2>
+        <p class="scene-subheading" id="reasons-subheading"></p>
+        <div class="reasons-grid" id="reasons-grid"></div>
+        <button class="btn btn-primary" id="reasons-continue-btn" type="button"></button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 5 — TIMELINE
+    ============================================================= -->
+    <section class="scene scene-timeline" id="scene-timeline" data-scene="timeline">
+      <div class="scene-inner scene-inner-wide">
+        <h2 class="scene-heading" id="timeline-heading"></h2>
+        <p class="scene-subheading" id="timeline-subheading"></p>
+        <div class="timeline" id="timeline-list"></div>
+        <button class="btn btn-primary" id="timeline-continue-btn" type="button"></button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 6 — LITTLE LOVE NOTES (envelopes)
+    ============================================================= -->
+    <section class="scene scene-notes" id="scene-notes" data-scene="notes">
+      <div class="scene-inner scene-inner-wide">
+        <h2 class="scene-heading" id="notes-heading"></h2>
+        <p class="scene-subheading" id="notes-subheading"></p>
+        <div class="envelopes-grid" id="envelopes-grid"></div>
+        <button class="btn btn-primary" id="notes-continue-btn" type="button"></button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 7 — BIRTHDAY WISHES (fireworks / confetti / balloons)
+    ============================================================= -->
+    <section class="scene scene-wishes" id="scene-wishes" data-scene="wishes">
+      <canvas class="wishes-canvas" id="wishes-canvas" aria-hidden="true"></canvas>
+      <div class="scene-inner">
+        <h2 class="scene-heading wishes-heading" id="wishes-heading"></h2>
+        <p class="scene-subheading" id="wishes-subheading"></p>
+        <button class="btn btn-primary btn-glow" id="wishes-continue-btn" type="button"></button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCENE 8 — FINAL SURPRISE (gift box)
+    ============================================================= -->
+    <section class="scene scene-finale" id="scene-finale" data-scene="finale">
+      <canvas class="finale-canvas" id="finale-canvas" aria-hidden="true"></canvas>
+      <div class="scene-inner">
+
+        <div class="gift-box-wrap" id="gift-box-wrap">
+          <button class="gift-button" id="gift-ribbon-btn" type="button" aria-label="Untie the ribbon">
+            <svg class="gift-svg" viewBox="0 0 200 190" aria-hidden="true">
+              <ellipse class="gift-shadow" cx="100" cy="178" rx="70" ry="8" />
+              <g id="gift-box-body">
+                <rect x="20" y="70" width="160" height="110" rx="10" class="gift-box-fill" />
+                <rect x="20" y="70" width="160" height="110" rx="10" class="gift-box-shine" />
+              </g>
+              <g id="gift-ribbon-bow">
+                <rect x="90" y="70" width="20" height="110" class="gift-ribbon-fill" />
+                <path class="gift-bow-fill" d="M100 62 C80 40 55 45 60 62 C63 72 85 70 100 62 Z" />
+                <path class="gift-bow-fill" d="M100 62 C120 40 145 45 140 62 C137 72 115 70 100 62 Z" />
+                <circle cx="100" cy="62" r="9" class="gift-bow-knot" />
+              </g>
+              <g id="gift-lid">
+                <rect x="10" y="48" width="180" height="30" rx="8" class="gift-lid-fill" />
+                <rect x="82" y="48" width="36" height="30" class="gift-lid-ribbon" />
+              </g>
+            </svg>
+          </button>
+          <p class="gift-prompt" id="gift-prompt"></p>
+        </div>
+
+        <div class="gift-reveal" id="gift-reveal" hidden>
+          <p class="gift-message-inside" id="gift-message-inside"></p>
+          <p class="gift-message-under" id="gift-message-under"></p>
+          <div class="finale-heart-wrap" id="finale-heart-wrap">
+            <canvas id="constellation-canvas" class="constellation-canvas" aria-hidden="true"></canvas>
+          </div>
+          <div class="finale-actions">
+            <button class="btn btn-secondary" id="finale-secrets-btn" type="button"></button>
+            <button class="btn btn-primary" id="finale-replay-btn" type="button"></button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ MODALS ============ -->
+
+  <!-- Memory (gallery) modal -->
+  <div class="modal" id="memory-modal" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog memory-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="memory-modal-title">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">✕</button>
+      <img class="memory-modal-image" id="memory-modal-image" src="" alt="" />
+      <h3 id="memory-modal-title"></h3>
+      <p id="memory-modal-caption"></p>
+    </div>
+  </div>
+
+  <!-- Love note modal -->
+  <div class="modal" id="note-modal" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog note-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="note-modal-label">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">✕</button>
+      <p class="note-modal-label" id="note-modal-label"></p>
+      <p class="note-modal-message" id="note-modal-message"></p>
+    </div>
+  </div>
+
+  <!-- Secrets hub modal (bonus) -->
+  <div class="modal" id="secrets-modal" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="secrets-modal-title">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">✕</button>
+      <h3 id="secrets-modal-title">A couple more secrets…</h3>
+      <div class="secrets-options">
+        <button class="btn btn-secondary" id="open-scratch-btn" type="button">🪙 Scratch Card</button>
+        <button class="btn btn-secondary" id="open-puzzle-btn" type="button">🧩 Little Puzzle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scratch-off card modal (bonus) -->
+  <div class="modal" id="scratch-modal" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="scratch-modal-title">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">✕</button>
+      <h3 id="scratch-modal-title">Scratch to reveal</h3>
+      <div class="scratch-wrap" id="scratch-wrap">
+        <p class="scratch-hidden-message" id="scratch-hidden-message"></p>
+        <canvas class="scratch-canvas" id="scratch-canvas" width="360" height="200"></canvas>
+      </div>
+      <p class="scratch-hint" id="scratch-hint-text">Click and drag, or swipe, to scratch it off</p>
+    </div>
+  </div>
+
+  <!-- Swap puzzle modal (bonus) -->
+  <div class="modal" id="puzzle-modal" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="puzzle-modal-title">
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">✕</button>
+      <h3 id="puzzle-modal-title">Little Puzzle</h3>
+      <p class="puzzle-instructions" id="puzzle-instructions"></p>
+      <div class="puzzle-grid" id="puzzle-grid"></div>
+      <p class="puzzle-solved-message" id="puzzle-solved-message" hidden></p>
+    </div>
+  </div>
+
+  <!-- Secret star discovery toast -->
+  <div class="star-toast" id="star-toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- Konami code celebration overlay -->
+  <div class="konami-overlay" id="konami-overlay" hidden>
+    <div class="konami-content">
+      <p id="konami-message"></p>
+    </div>
+  </div>
+
+  <!-- ============ SCRIPTS (order matters — config/utils first, main.js last) ============ -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/particles-ambient.js"></script>
+  <script src="js/particles-celebration.js"></script>
+  <script src="js/sections/welcome.js"></script>
+  <script src="js/sections/letter.js"></script>
+  <script src="js/sections/gallery.js"></script>
+  <script src="js/sections/reasons.js"></script>
+  <script src="js/sections/timeline.js"></script>
+  <script src="js/sections/notes.js"></script>
+  <script src="js/sections/wishes.js"></script>
+  <script src="js/sections/finale.js"></script>
+  <script src="js/easter-eggs.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

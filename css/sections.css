@@ -1,0 +1,786 @@
+/* ============================================================================
+   SECTIONS.CSS — visuals specific to each scene, in journey order.
+   Global chrome (buttons, modals, canvases, progress dots) lives in layout.css.
+============================================================================ */
+
+/* ============================================================================
+   0. COUNTDOWN
+============================================================================ */
+.scene-countdown .scene-inner { max-width: 480px; }
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+  width: 100%;
+}
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-sm) 0.25rem;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-md);
+}
+.countdown-value {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 700;
+  color: var(--color-pink-deep);
+  font-variant-numeric: tabular-nums;
+}
+.countdown-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-soft);
+  margin-top: 0.25rem;
+}
+.countdown-arrived {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--color-pink-deep);
+  animation: popIn var(--duration-base) var(--ease-standard);
+}
+
+/* ============================================================================
+   1. WELCOME
+============================================================================ */
+.welcome-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 560px;
+  height: 560px;
+  max-width: 140vw;
+  background: radial-gradient(circle, rgba(240, 200, 160, 0.55), transparent 70%);
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  pointer-events: none;
+  animation: twinkle 5s ease-in-out infinite;
+}
+/* Entrance animations are gated behind ".play-intro" (added by welcome.js
+   exactly when the Welcome scene becomes active — see the note in utils.js
+   above replayAnimation()) rather than applied unconditionally, so they
+   play when she actually sees them instead of while the scene is hidden. */
+.welcome-title {
+  font-size: clamp(2.1rem, 6vw, 3.8rem);
+  background: linear-gradient(135deg, var(--color-pink-deep), var(--color-gold), var(--color-lavender-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  opacity: 0;
+}
+.welcome-subtitle {
+  font-size: 1.15rem;
+  color: var(--color-text-soft);
+  opacity: 0;
+}
+#welcome-btn {
+  opacity: 0;
+}
+.scene-welcome.play-intro .welcome-title {
+  animation: fadeInDown 1s var(--ease-standard) both, textGlow 3s ease-in-out infinite 1s;
+}
+.scene-welcome.play-intro .welcome-subtitle {
+  animation: fadeInUp 1s var(--ease-standard) 0.35s both;
+}
+.scene-welcome.play-intro #welcome-btn {
+  animation: fadeInUp 1s var(--ease-standard) 0.7s both, glowPulse 2.6s ease-in-out infinite 1.7s;
+}
+
+/* ============================================================================
+   2. LOVE LETTER
+============================================================================ */
+.letter-paper {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  background: linear-gradient(180deg, #fffdf9, var(--color-cream));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lift);
+  padding: var(--space-lg);
+  padding-bottom: var(--space-xl);
+  text-align: left;
+  transform-origin: top center;
+  opacity: 0;
+}
+/* Gated behind ".play-intro" (added by letter.js on scene-enter) — see the
+   note above .welcome-title in this file, and replayAnimation() in utils.js. */
+.letter-paper.play-intro {
+  animation: letterUnfold 900ms var(--ease-standard) both;
+}
+.letter-text {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  min-height: 160px;
+}
+.letter-text .typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--color-pink-deep);
+  animation: typingCursorBlink 0.9s steps(1) infinite;
+}
+.letter-signoff {
+  margin-top: var(--space-md);
+  font-style: italic;
+  text-align: right;
+  color: var(--color-text-soft);
+  animation: fadeIn var(--duration-base) var(--ease-standard);
+}
+.letter-skip {
+  position: absolute;
+  bottom: var(--space-sm);
+  right: var(--space-md);
+}
+
+/* ============================================================================
+   3. OUR MEMORIES (polaroid gallery)
+============================================================================ */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-lg);
+  width: 100%;
+}
+.memory-card {
+  position: relative;
+  perspective: 1200px;
+  aspect-ratio: 3 / 4;
+  opacity: 0;
+}
+/* Gated behind ".play-intro" on the grid (added by gallery.js on scene-enter)
+   — see the note above .welcome-title in this file. */
+.gallery-grid.play-intro .memory-card {
+  animation: popIn var(--duration-base) var(--ease-standard) forwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+/* The card is a <div> containing two SIBLING <button>s (flip + view-larger)
+   rather than a button-in-a-button, which HTML disallows. */
+.memory-card-flip-btn {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.memory-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s var(--ease-standard);
+}
+.memory-card.is-flipped .memory-card-inner {
+  transform: rotateY(180deg);
+}
+.memory-view-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--duration-fast) var(--ease-standard), background var(--duration-fast);
+}
+.memory-view-btn:hover,
+.memory-view-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.85);
+  transform: scale(1.1);
+}
+.memory-view-hint {
+  font-size: 0.72rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+.memory-card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.memory-card-front {
+  background: var(--color-white);
+  padding: 10px 10px 34px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+}
+.memory-card:nth-child(3n) .memory-card-front { transform: rotate(-2deg); }
+.memory-card:nth-child(3n + 1) .memory-card-front { transform: rotate(1.5deg); }
+.memory-card:nth-child(3n + 2) .memory-card-front { transform: rotate(-1deg); }
+.memory-card:not(.is-flipped):hover .memory-card-inner,
+.memory-card:not(.is-flipped):focus-within .memory-card-inner {
+  transform: scale(1.035) translateY(-4px);
+}
+.memory-card-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+}
+.memory-title {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-script);
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+.memory-card-back {
+  background: linear-gradient(135deg, var(--color-blush), var(--color-lavender));
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  text-align: center;
+}
+.memory-caption {
+  font-size: 0.9rem;
+  color: var(--color-ink);
+}
+.btn-mini {
+  padding: 0.5em 1.2em;
+  font-size: 0.82rem;
+  min-height: auto;
+}
+
+/* ============================================================================
+   4. REASONS I LOVE YOU
+============================================================================ */
+.reasons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-sm);
+  width: 100%;
+}
+.reason-card {
+  perspective: 900px;
+  aspect-ratio: 1 / 1;
+  opacity: 0;
+}
+/* Gated behind ".play-intro" on the grid (added by reasons.js on scene-enter)
+   — see the note above .welcome-title in this file. */
+.reasons-grid.play-intro .reason-card {
+  animation: popIn var(--duration-base) var(--ease-standard) forwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+.reason-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s var(--ease-standard);
+}
+.reason-card.is-flipped .reason-card-inner {
+  transform: rotateY(180deg);
+}
+.reason-card:not(.is-flipped):hover .reason-card-inner,
+.reason-card:not(.is-flipped):focus-visible .reason-card-inner {
+  transform: scale(1.06) rotateZ(-1.5deg);
+}
+.reason-card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+}
+.reason-card-front {
+  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender-deep));
+  color: var(--color-white);
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.reason-heart-icon {
+  fill: currentColor;
+  opacity: 0.9;
+}
+.reason-index {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+.reason-card-back {
+  background: var(--color-white);
+  transform: rotateY(180deg);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+/* ============================================================================
+   5. TIMELINE
+============================================================================ */
+.timeline {
+  position: relative;
+  width: 100%;
+  padding: var(--space-lg) 0;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(var(--color-pink), var(--color-lavender-deep), var(--color-gold));
+  transform: translateX(-50%);
+  border-radius: 3px;
+}
+.timeline-item {
+  position: relative;
+  width: 50%;
+  padding: 0 var(--space-xl) var(--space-xl) var(--space-lg);
+  opacity: 0;
+}
+.timeline-item.is-visible {
+  animation: slideInLeft var(--duration-slow) var(--ease-standard) forwards;
+}
+.timeline-item:nth-child(even) {
+  left: 50%;
+  padding: 0 var(--space-lg) var(--space-xl) var(--space-xl);
+}
+.timeline-item:nth-child(even).is-visible {
+  animation-name: slideInRight;
+}
+.timeline-icon {
+  position: absolute;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 2px solid var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-soft);
+  z-index: 1;
+}
+.timeline-item:nth-child(odd) .timeline-icon { right: -22px; }
+.timeline-item:nth-child(even) .timeline-icon { left: -22px; }
+.timeline-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: left;
+}
+.timeline-date {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-pink-deep);
+  font-weight: 700;
+}
+.timeline-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  margin: 0.3em 0;
+}
+.timeline-desc {
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+}
+
+/* ============================================================================
+   6. LITTLE LOVE NOTES (envelopes)
+============================================================================ */
+.envelopes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--space-lg);
+  width: 100%;
+}
+.envelope-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  animation: floatY 4.5s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.3s);
+}
+.envelope {
+  position: relative;
+  width: 100%;
+  max-width: 170px;
+  aspect-ratio: 3 / 2;
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast);
+}
+.envelope::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 45% 0;
+  background: linear-gradient(135deg, var(--color-pink), var(--color-pink-deep));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.envelope::after {
+  content: "♥";
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  box-shadow: var(--shadow-soft);
+}
+.envelope-card:hover .envelope,
+.envelope-card:focus-visible .envelope {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: var(--shadow-lift);
+}
+.envelope-card.is-clicked .envelope {
+  animation: wiggle 0.4s var(--ease-standard);
+}
+.envelope-label {
+  font-family: var(--font-script);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  text-align: center;
+  max-width: 170px;
+}
+
+/* ============================================================================
+   7. BIRTHDAY WISHES
+============================================================================ */
+.scene-wishes { overflow: hidden; }
+.wishes-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.scene-wishes .scene-inner { z-index: 2; }
+.wishes-heading {
+  font-size: clamp(2.3rem, 7vw, 3.8rem);
+  background: linear-gradient(135deg, var(--color-pink-deep), var(--color-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: heartbeat 2.4s ease-in-out infinite;
+}
+
+.floaters-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.balloon {
+  position: absolute;
+  bottom: -140px;
+  width: 46px;
+  height: 58px;
+  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
+  box-shadow: inset -8px -8px 14px rgba(0, 0, 0, 0.12), var(--shadow-soft);
+  animation: risingUp linear forwards;
+}
+.balloon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -34px;
+  width: 1px;
+  height: 34px;
+  background: rgba(107, 84, 104, 0.4);
+  transform: translateX(-50%);
+}
+.lantern {
+  position: absolute;
+  bottom: -160px;
+  width: 32px;
+  height: 42px;
+  border-radius: 6px 6px 14px 14px;
+  background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
+  box-shadow: 0 0 18px 6px rgba(240, 200, 120, 0.55);
+  animation: risingUp linear forwards;
+}
+.lantern::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 14px;
+  height: 6px;
+  background: var(--color-gold);
+  border-radius: 3px;
+  transform: translateX(-50%);
+}
+
+/* ============================================================================
+   8. FINAL SURPRISE (gift box)
+============================================================================ */
+.scene-finale { overflow: visible; }
+.finale-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.scene-finale .scene-inner { z-index: 2; }
+
+.gift-box-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  opacity: 0;
+}
+/* Gated behind ".play-intro" (added by finale.js on scene-enter, and again
+   on every replay) — see the note above .welcome-title in this file. */
+.gift-box-wrap.play-intro {
+  animation: fadeInScale var(--duration-slow) var(--ease-standard) both;
+}
+.gift-button {
+  width: min(260px, 68vw);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+.gift-button:hover { transform: translateY(-4px); }
+.gift-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 14px 20px rgba(120, 70, 105, 0.25));
+}
+.gift-shadow { fill: rgba(80, 40, 70, 0.15); }
+.gift-box-fill { fill: var(--color-pink); }
+.gift-box-shine { fill: rgba(255, 255, 255, 0.16); }
+.gift-ribbon-fill,
+.gift-bow-fill,
+.gift-lid-ribbon { fill: var(--color-gold); }
+.gift-bow-knot { fill: var(--color-gold); stroke: var(--color-white); stroke-width: 2; }
+.gift-lid-fill { fill: var(--color-pink-deep); }
+
+#gift-ribbon-bow,
+#gift-lid,
+#gift-box-body {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+#gift-ribbon-bow.is-wiggle { animation: wiggle 0.4s var(--ease-standard); }
+#gift-ribbon-bow.is-untied { animation: ribbonFallAway 0.6s var(--ease-standard) forwards; }
+#gift-lid.is-open { animation: lidOpen 0.8s var(--ease-standard) forwards; }
+
+.gift-prompt {
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+}
+
+.gift-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  animation: fadeInScale var(--duration-slow) var(--ease-standard);
+}
+.gift-message-inside {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  color: var(--color-pink-deep);
+  max-width: 32ch;
+  animation: textGlow 3s ease-in-out infinite;
+}
+.gift-message-under {
+  font-size: 1.25rem;
+  color: var(--color-text-soft);
+}
+.finale-heart-wrap {
+  width: min(420px, 88vw);
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+.constellation-canvas {
+  width: 100%;
+  height: 100%;
+}
+.finale-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+/* ============================================================================
+   BONUS — secret stars (injected across several scenes by easter-eggs.js)
+============================================================================ */
+.secret-star {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  color: var(--color-gold);
+  font-size: 1.15rem;
+  z-index: 3;
+  animation: twinkle 2.4s ease-in-out infinite;
+  transition: opacity var(--duration-fast), transform var(--duration-fast);
+}
+.secret-star:hover,
+.secret-star:focus-visible {
+  opacity: 1;
+  transform: scale(1.3);
+}
+.secret-star.is-found {
+  opacity: 0.15;
+  animation: none;
+  pointer-events: none;
+}
+[data-scene="welcome"] .secret-star  { top: 14%; right: 9%; }
+[data-scene="letter"] .secret-star   { bottom: 6%; left: 4%; }
+[data-scene="gallery"] .secret-star  { top: 2%; left: 3%; }
+[data-scene="timeline"] .secret-star { top: 4%; right: 4%; }
+[data-scene="notes"] .secret-star    { bottom: 3%; right: 4%; }
+[data-scene="wishes"] .secret-star   { top: 16%; left: 8%; }
+
+/* ============================================================================
+   BONUS — memory / note modal content, secrets hub, scratch card, puzzle
+============================================================================ */
+.memory-modal-dialog { max-width: 520px; }
+.memory-modal-image {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+  box-shadow: var(--shadow-soft);
+}
+.memory-modal-dialog h3 {
+  font-family: var(--font-heading);
+  margin-bottom: 0.4em;
+}
+
+.note-modal-dialog { max-width: 440px; }
+.note-modal-label {
+  font-family: var(--font-heading);
+  color: var(--color-pink-deep);
+  margin-bottom: var(--space-sm);
+}
+.note-modal-message {
+  font-family: var(--font-script);
+  font-size: 1.2rem;
+  line-height: 1.75;
+}
+
+.secrets-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.scratch-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  margin: var(--space-md) auto 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+.scratch-hidden-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  background: linear-gradient(135deg, var(--color-blush), var(--color-lavender));
+  color: var(--color-ink);
+  text-align: center;
+}
+.scratch-canvas {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 200px;
+  touch-action: none;
+  cursor: pointer;
+}
+.scratch-hint {
+  margin-top: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+}
+
+.puzzle-instructions {
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+  margin: 0.4em 0 var(--space-md);
+}
+.puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  max-width: 340px;
+  margin: 0 auto;
+}
+.puzzle-tile {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-pink), var(--color-lavender-deep));
+  color: var(--color-white);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-align: center;
+  padding: 0.25rem;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast), outline-offset var(--duration-fast);
+}
+.puzzle-tile:hover { transform: translateY(-2px); }
+.puzzle-tile.is-selected { outline: 3px solid var(--color-gold); outline-offset: 2px; }
+.puzzle-tile.is-correct { background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold)); }
+.puzzle-solved-message {
+  margin-top: var(--space-md);
+  font-family: var(--font-heading);
+  color: var(--color-pink-deep);
+  animation: popIn var(--duration-base) var(--ease-standard);
+}
