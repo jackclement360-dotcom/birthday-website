@@ -33,6 +33,13 @@ button {
 a {
   color: inherit;
 }
+/* The hidden attribute must always win — several components (modals, the
+   Konami overlay, the star counter) set display:flex on their class, which
+   would otherwise override the UA stylesheet's low-specificity display:none
+   and make every "hidden" overlay visible on page load. */
+[hidden] {
+  display: none !important;
+}
 
 /* ── Design tokens ─────────────────────────────────────────────────────── */
 :root {
