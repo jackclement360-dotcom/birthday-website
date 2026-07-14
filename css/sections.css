@@ -64,7 +64,7 @@
    play when she actually sees them instead of while the scene is hidden. */
 .welcome-title {
   font-size: clamp(2.1rem, 6vw, 3.8rem);
-  background: linear-gradient(135deg, var(--color-pink-deep), var(--color-gold), var(--color-lavender-deep));
+  background: linear-gradient(135deg, var(--color-pink-text), var(--color-gold-text), var(--color-lavender-text));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -494,7 +494,7 @@
 .scene-wishes .scene-inner { z-index: 2; }
 .wishes-heading {
   font-size: clamp(2.3rem, 7vw, 3.8rem);
-  background: linear-gradient(135deg, var(--color-pink-deep), var(--color-gold));
+  background: linear-gradient(135deg, var(--color-pink-text), var(--color-gold-text));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

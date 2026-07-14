@@ -66,6 +66,13 @@ a {
   --color-accent: var(--color-gold);
   --color-accent-soft: var(--color-gold-light);
 
+  /* Deeper variants used ONLY for gradient-clipped display text — the
+     regular palette tokens are too pale to stay readable once they're
+     the fill of large glowing type on the pastel background. */
+  --color-pink-text: #c2557f;
+  --color-gold-text: #b8873b;
+  --color-lavender-text: #8a6cc4;
+
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.38);
   --glass-bg-strong: rgba(255, 255, 255, 0.55);
@@ -116,9 +123,10 @@ a {
 }
 
 /* ── Base typography ──────────────────────────────────────────────────── */
-html {
-  scroll-behavior: smooth;
-}
+/* Note: no `scroll-behavior: smooth` here on purpose — some embedded/
+   automated browser engines stall smooth scrolls indefinitely, which
+   left the page unable to scroll at all. Scene changes jump to top
+   instantly instead (invisible behind the crossfade — see Journey.goTo). */
 body {
   font-family: var(--font-body);
   color: var(--color-text);

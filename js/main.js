@@ -66,7 +66,9 @@ const Journey = (function () {
     target.removeAttribute("aria-hidden");
     if ("inert" in target) target.inert = false;
 
-    window.scrollTo({ top: 0, behavior: AppState.reducedMotion ? "auto" : "smooth" });
+    // Always instant: the scene crossfade masks the jump, and smooth
+    // scrolling stalls outright in some embedded browser engines.
+    window.scrollTo({ top: 0, behavior: "auto" });
     updateDots();
     AppEvents.emit("scene:enter", name);
   }
