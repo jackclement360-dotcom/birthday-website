@@ -129,12 +129,6 @@
   100% { opacity: 1; transform: scaleY(1) rotateX(0deg); }
 }
 
-@keyframes risingUp {
-  0%   { transform: translateY(0) translateX(0); opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { transform: translateY(-110vh) translateX(var(--drift, 0px)); opacity: 0; }
-}
 
 /* ============================================================================
    REDUCED MOTION — respects the OS-level "prefers-reduced-motion" setting.

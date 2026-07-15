@@ -9,9 +9,6 @@ const SceneWishes = (function () {
   let fireworkInterval = null;
   let heartInterval = null;
   let floaterInterval = null;
-  let floatersLayer = null;
-
-  const BALLOON_COLORS = ["#eeaecb", "#dcd0f5", "#f0d9a3", "#d9789f", "#b6a0e0"];
 
   function init() {
     $("#wishes-heading").textContent = CONFIG.wishes.heading;
@@ -39,42 +36,28 @@ const SceneWishes = (function () {
     system.spawnConfettiBurst(AppState.reducedMotion ? 40 : 120);
 
     if (!AppState.reducedMotion) {
-      fireworkInterval = setInterval(() => system.launchFirework(), randomBetween(900, 1700));
+      // Open with a couple of immediate fireworks so the sky is never empty,
+      // then keep launching on a loose rhythm.
+      system.launchFirework();
+      setTimeout(() => system.launchFirework(), 450);
+      fireworkInterval = setInterval(() => system.launchFirework(), 1300);
       heartInterval = setInterval(() => system.spawnHeart(), 350);
-
-      floatersLayer = document.createElement("div");
-      floatersLayer.className = "floaters-layer";
-      $("#scene-wishes").appendChild(floatersLayer);
-      spawnFloater();
-      floaterInterval = setInterval(spawnFloater, 1300);
+      system.spawnFloater();
+      floaterInterval = setInterval(() => system.spawnFloater(), 1400);
     }
-  }
-
-  function spawnFloater() {
-    if (!floatersLayer) return;
-    const isBalloon = Math.random() > 0.4;
-    const el = document.createElement("div");
-    el.className = isBalloon ? "balloon" : "lantern";
-    el.style.left = randomBetween(5, 90) + "%";
-    el.style.setProperty("--drift", randomBetween(-60, 60) + "px");
-    el.style.animationDuration = randomBetween(9, 15) + "s";
-    if (isBalloon) {
-      el.style.background = BALLOON_COLORS[randomInt(0, BALLOON_COLORS.length - 1)];
-    }
-    floatersLayer.appendChild(el);
-    setTimeout(() => el.remove(), 16000);
   }
 
   function stopShow() {
-    if (system) system.stop();
+    if (system) {
+      system.stop();
+      system.clear();
+    }
     if (fireworkInterval) clearInterval(fireworkInterval);
     if (heartInterval) clearInterval(heartInterval);
     if (floaterInterval) clearInterval(floaterInterval);
     fireworkInterval = null;
     heartInterval = null;
     floaterInterval = null;
-    if (floatersLayer && floatersLayer.parentNode) floatersLayer.parentNode.removeChild(floatersLayer);
-    floatersLayer = null;
   }
 
   return { init };

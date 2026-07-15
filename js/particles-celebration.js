@@ -1,13 +1,14 @@
 /* ============================================================================
    PARTICLES-CELEBRATION.JS — reusable canvas particle engine: confetti,
-   fireworks, and rising hearts. `createParticleSystem(canvas)` is a factory,
-   not a singleton — the Birthday Wishes scene and the Final Surprise scene
-   each create their OWN instance bound to their own <canvas>, so the two
-   celebrations never share state or fight over the same animation loop.
-   Balloons and paper lanterns are simple DOM/CSS elements instead of canvas
-   particles (see sections.css .balloon/.lantern) — they're simple shapes
-   that look better with real gradients and box-shadow glow than hand-drawn
-   canvas paths, and there are never more than a couple on screen at once.
+   fireworks, rising hearts, and floating balloons/lanterns.
+   `createParticleSystem(canvas)` is a factory, not a singleton — the
+   Birthday Wishes scene and the Final Surprise scene each create their OWN
+   instance bound to their own <canvas>, so the two celebrations never share
+   state or fight over the same animation loop.
+   Balloons/lanterns are canvas-drawn rather than DOM elements with CSS
+   animations on purpose: dynamically-inserted compositor animations froze
+   at t=0 in an embedded Chrome variant during testing, while rAF-driven
+   canvas drawing behaved identically everywhere.
 ============================================================================ */
 
 const CELEBRATION_COLORS = ["#eeaecb", "#d9789f", "#dcd0f5", "#d9af6a", "#f7d9e3", "#ffffff"];
@@ -15,7 +16,7 @@ const CELEBRATION_COLORS = ["#eeaecb", "#d9789f", "#dcd0f5", "#d9af6a", "#f7d9e3
 function createParticleSystem(canvasEl) {
   const ctx = canvasEl.getContext("2d");
   let width = 0, height = 0, dpr = 1;
-  let confetti = [], fireworkShells = [], sparks = [], hearts = [];
+  let confetti = [], fireworkShells = [], sparks = [], hearts = [], floaters = [];
   let rafId = null, running = false, lastTime = 0;
 
   function resize() {
@@ -61,10 +62,10 @@ function createParticleSystem(canvasEl) {
   }
 
   function explode(shell) {
-    const count = 32;
+    const count = 40;
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count;
-      const speed = randomBetween(60, 160);
+      const speed = randomBetween(70, 190);
       sparks.push({
         x: shell.x,
         y: shell.y,
@@ -72,8 +73,8 @@ function createParticleSystem(canvasEl) {
         vy: Math.sin(angle) * speed,
         color: shell.color,
         life: 0,
-        maxLife: randomBetween(0.7, 1.2),
-        size: randomBetween(2, 3.5),
+        maxLife: randomBetween(0.9, 1.5),
+        size: randomBetween(2.5, 4.5),
       });
     }
   }
@@ -93,6 +94,72 @@ function createParticleSystem(canvasEl) {
       color: CELEBRATION_COLORS[randomInt(0, CELEBRATION_COLORS.length - 1)],
     });
     start();
+  }
+
+  // Balloons and paper lanterns drifting up from below the fold.
+  function spawnFloater() {
+    const isBalloon = Math.random() > 0.4;
+    floaters.push({
+      type: isBalloon ? "balloon" : "lantern",
+      x: randomBetween(width * 0.05, width * 0.95),
+      y: height + 80,
+      riseSpeed: randomBetween(45, 85),
+      sway: randomBetween(20, 55),
+      swaySpeed: randomBetween(0.3, 0.8),
+      phase: randomBetween(0, Math.PI * 2),
+      scale: randomBetween(0.8, 1.25),
+      color: CELEBRATION_COLORS[randomInt(0, CELEBRATION_COLORS.length - 1)],
+    });
+    start();
+  }
+
+  function drawBalloon(f) {
+    const w = 44 * f.scale;
+    const h = 56 * f.scale;
+    // String
+    ctx.strokeStyle = "rgba(107, 84, 104, 0.45)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.52);
+    ctx.quadraticCurveTo(4 * f.scale, h * 0.75, 0, h * 1.1);
+    ctx.stroke();
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = f.color;
+    ctx.fill();
+    // Knot
+    ctx.beginPath();
+    ctx.moveTo(-4 * f.scale, h * 0.5);
+    ctx.lineTo(4 * f.scale, h * 0.5);
+    ctx.lineTo(0, h * 0.58);
+    ctx.closePath();
+    ctx.fill();
+    // Highlight
+    ctx.beginPath();
+    ctx.ellipse(-w * 0.18, -h * 0.2, w * 0.13, h * 0.18, -0.5, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+    ctx.fill();
+  }
+
+  function drawLantern(f) {
+    const w = 30 * f.scale;
+    const h = 40 * f.scale;
+    ctx.save();
+    ctx.shadowColor = "rgba(240, 200, 120, 0.85)";
+    ctx.shadowBlur = 18;
+    const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    grad.addColorStop(0, "#f0d9a3");
+    grad.addColorStop(1, "#d9af6a");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-w / 2, -h / 2, w, h, [5, 5, 12, 12]);
+    else ctx.rect(-w / 2, -h / 2, w, h);
+    ctx.fill();
+    ctx.restore();
+    // Cap
+    ctx.fillStyle = "#d9af6a";
+    ctx.fillRect(-w * 0.25, -h / 2 - 5 * f.scale, w * 0.5, 5 * f.scale);
   }
 
   // One quick radial burst at a point — used by the finale gift box.
@@ -132,6 +199,7 @@ function createParticleSystem(canvasEl) {
     fireworkShells = [];
     sparks = [];
     hearts = [];
+    floaters = [];
     ctx.clearRect(0, 0, width, height);
   }
 
@@ -168,11 +236,17 @@ function createParticleSystem(canvasEl) {
     });
     hearts = hearts.filter((h) => h.life < h.maxLife && h.y > -30);
 
+    floaters.forEach((f) => {
+      f.phase += f.swaySpeed * dt;
+      f.y -= f.riseSpeed * dt;
+    });
+    floaters = floaters.filter((f) => f.y > -120);
+
     draw();
 
     // Self-managing: once every array drains and nothing new is being
     // spawned, the loop stops itself rather than running forever at idle.
-    if (!confetti.length && !fireworkShells.length && !sparks.length && !hearts.length) {
+    if (!confetti.length && !fireworkShells.length && !sparks.length && !hearts.length && !floaters.length) {
       stop();
       return;
     }
@@ -222,7 +296,20 @@ function createParticleSystem(canvasEl) {
       drawHeartShape(ctx, h.size, h.color);
       ctx.restore();
     });
+
+    floaters.forEach((f) => {
+      const x = f.x + Math.sin(f.phase) * f.sway;
+      // Fade in as they clear the bottom edge, fade out near the top.
+      const fade = clamp((height + 60 - f.y) / 120, 0, 1) * clamp(f.y / (height * 0.18), 0, 1);
+      ctx.save();
+      ctx.globalAlpha = 0.92 * fade;
+      ctx.translate(x, f.y);
+      ctx.rotate(Math.sin(f.phase) * 0.06);
+      if (f.type === "balloon") drawBalloon(f);
+      else drawLantern(f);
+      ctx.restore();
+    });
   }
 
-  return { start, stop, clear, resize, spawnConfettiBurst, launchFirework, spawnHeart, burstAt };
+  return { start, stop, clear, resize, spawnConfettiBurst, launchFirework, spawnHeart, spawnFloater, burstAt };
 }

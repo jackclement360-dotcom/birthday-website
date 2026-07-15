@@ -508,53 +508,9 @@
   animation: heartbeat 2.4s ease-in-out infinite;
 }
 
-.floaters-layer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 1;
-}
-.balloon {
-  position: absolute;
-  bottom: -140px;
-  width: 46px;
-  height: 58px;
-  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
-  box-shadow: inset -8px -8px 14px rgba(0, 0, 0, 0.12), var(--shadow-soft);
-  animation: risingUp linear forwards;
-}
-.balloon::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -34px;
-  width: 1px;
-  height: 34px;
-  background: rgba(107, 84, 104, 0.4);
-  transform: translateX(-50%);
-}
-.lantern {
-  position: absolute;
-  bottom: -160px;
-  width: 32px;
-  height: 42px;
-  border-radius: 6px 6px 14px 14px;
-  background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
-  box-shadow: 0 0 18px 6px rgba(240, 200, 120, 0.55);
-  animation: risingUp linear forwards;
-}
-.lantern::before {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  width: 14px;
-  height: 6px;
-  background: var(--color-gold);
-  border-radius: 3px;
-  transform: translateX(-50%);
-}
+/* Balloons and lanterns are drawn on #wishes-canvas by the particle engine
+   (see particles-celebration.js) rather than as DOM elements — dynamically
+   inserted CSS animations proved unreliable in embedded browser engines. */
 
 /* ============================================================================
    8. FINAL SURPRISE (gift box)
